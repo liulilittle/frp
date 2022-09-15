@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{1a127378-a3cc-4b4c-99a7-8dd44947155f}</ProjectGuid>
+    <RootNamespace>frp</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir);$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir);$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir);$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir);$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_WIN32_WINNT=0x0601;JEMALLOC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_WIN32_WINNT=0x0601;JEMALLOC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_WIN32_WINNT=0x0601;JEMALLOC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;_WIN32_WINNT=0x0601;JEMALLOC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="frp\client\Router.cpp" />
+    <ClCompile Include="frp\configuration\AppConfiguration.cpp" />
+    <ClCompile Include="frp\configuration\Ini.cpp" />
+    <ClCompile Include="frp\configuration\SslConfiguration.cpp" />
+    <ClCompile Include="frp\cryptography\Encryptor.cpp" />
+    <ClCompile Include="frp\io\File.cpp" />
+    <ClCompile Include="frp\messages\HandshakeRequest.cpp" />
+    <ClCompile Include="frp\messages\NetworkAddress.cpp" />
+    <ClCompile Include="frp\messages\Packet.cpp" />
+    <ClCompile Include="frp\net\IPEndPoint.cpp" />
+    <ClCompile Include="frp\net\Ipep.cpp" />
+    <ClCompile Include="frp\net\Socket.cpp" />
+    <ClCompile Include="frp\server\Connection.cpp" />
+    <ClCompile Include="frp\server\MappingEntry.cpp" />
+    <ClCompile Include="frp\server\Switches.cpp" />
+    <ClCompile Include="frp\ssl\SSL.cpp" />
+    <ClCompile Include="frp\stdafx.cpp" />
+    <ClCompile Include="frp\threading\Hosting.cpp" />
+    <ClCompile Include="frp\transmission\EncryptorTransmission.cpp" />
+    <ClCompile Include="frp\transmission\ITransmission.cpp" />
+    <ClCompile Include="frp\transmission\SslSocketTransmission.cpp" />
+    <ClCompile Include="frp\transmission\SslWebSocketTransmission.cpp" />
+    <ClCompile Include="frp\transmission\Transmission.cpp" />
+    <ClCompile Include="frp\transmission\WebSocketTransmission.cpp" />
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="frp\client\Router.h" />
+    <ClInclude Include="frp\collections\ConnectionManager.h" />
+    <ClInclude Include="frp\collections\DatagramPortManager.h" />
+    <ClInclude Include="frp\collections\Dictionary.h" />
+    <ClInclude Include="frp\collections\RestartTasksManger.h" />
+    <ClInclude Include="frp\collections\TransmissionManager.h" />
+    <ClInclude Include="frp\configuration\AppConfiguration.h" />
+    <ClInclude Include="frp\configuration\Ini.h" />
+    <ClInclude Include="frp\configuration\MappingConfiguration.h" />
+    <ClInclude Include="frp\configuration\MappingType.h" />
+    <ClInclude Include="frp\configuration\SslConfiguration.h" />
+    <ClInclude Include="frp\configuration\WebSocketConfiguration.h" />
+    <ClInclude Include="frp\cryptography\Encryptor.h" />
+    <ClInclude Include="frp\IDisposable.h" />
+    <ClInclude Include="frp\io\BinaryReader.h" />
+    <ClInclude Include="frp\io\File.h" />
+    <ClInclude Include="frp\io\MemoryStream.h" />
+    <ClInclude Include="frp\io\SeekOrigin.h" />
+    <ClInclude Include="frp\io\Stream.h" />
+    <ClInclude Include="frp\messages\checksum.h" />
+    <ClInclude Include="frp\messages\HandshakeRequest.h" />
+    <ClInclude Include="frp\messages\NetworkAddress.h" />
+    <ClInclude Include="frp\messages\Packet.h" />
+    <ClInclude Include="frp\messages\PacketCommands.h" />
+    <ClInclude Include="frp\net\IPEndPoint.h" />
+    <ClInclude Include="frp\net\Ipep.h" />
+    <ClInclude Include="frp\net\Socket.h" />
+    <ClInclude Include="frp\Reference.h" />
+    <ClInclude Include="frp\server\Connection.h" />
+    <ClInclude Include="frp\server\MappingEntry.h" />
+    <ClInclude Include="frp\server\Switches.h" />
+    <ClInclude Include="frp\ssl\root_certificates.hpp" />
+    <ClInclude Include="frp\ssl\SSL.h" />
+    <ClInclude Include="frp\threading\Timer.h" />
+    <ClInclude Include="frp\transmission\EncryptorTransmission.h" />
+    <ClInclude Include="frp\transmission\SslSocketTransmission.h" />
+    <ClInclude Include="frp\transmission\SslWebSocketTransmission.h" />
+    <ClInclude Include="frp\transmission\templates\SslSocket.hpp" />
+    <ClInclude Include="frp\transmission\templates\WebSocket.hpp" />
+    <ClInclude Include="frp\transmission\Transmission.h" />
+    <ClInclude Include="frp\stdafx.h" />
+    <ClInclude Include="frp\text\Encoding.h" />
+    <ClInclude Include="frp\threading\Hosting.h" />
+    <ClInclude Include="frp\transmission\ITransmission.h" />
+    <ClInclude Include="frp\transmission\WebSocketTransmission.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="frpc.ini" />
+    <None Include="frps.ini" />
+    <None Include="Resource.aps" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="CMakeLists.txt" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

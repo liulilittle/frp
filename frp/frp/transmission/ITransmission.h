@@ -1,0 +1,39 @@
+#pragma once
+
+#include <frp/IDisposable.h>
+#include <frp/net/IPEndPoint.h>
+
+namespace frp {
+    namespace transmission {
+        class ITransmission : public IDisposable {
+        public:
+            typedef std::function<void(const std::shared_ptr<Byte>&, int)>      ReadAsyncCallback;
+            typedef std::function<void(bool)>                                   WriteAsyncCallback;
+            typedef WriteAsyncCallback                                          HandshakeAsyncCallback;
+            typedef enum {
+                HandshakeType_Server,
+                HandshakeType_Client,
+            }                                                                   HandshakeType;
+
+        public:
+            void                                                                Close() noexcept;
+
+        public:
+            virtual bool                                                        HandshakeAsync(
+                HandshakeType                                                   type,
+                const BOOST_ASIO_MOVE_ARG(HandshakeAsyncCallback)               callback) = 0;
+            virtual bool                                                        ReadAsync(
+                const BOOST_ASIO_MOVE_ARG(ReadAsyncCallback)                    callback) = 0;
+            virtual bool                                                        WriteAsync(
+                const std::shared_ptr<Byte>&                                    buffer,
+                int                                                             offset, 
+                int                                                             length, 
+                const BOOST_ASIO_MOVE_ARG(WriteAsyncCallback)                   callback) = 0;
+
+        public:
+            virtual std::shared_ptr<boost::asio::io_context>                    GetContext() = 0;
+            virtual frp::net::IPEndPoint                                        GetLocalEndPoint() = 0;
+            virtual frp::net::IPEndPoint                                        GetRemoteEndPoint() = 0;
+        };
+    }
+}

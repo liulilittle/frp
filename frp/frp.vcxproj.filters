@@ -1,0 +1,247 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="frp\io\File.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="frp\threading\Hosting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="frp\stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="frp\transmission\Transmission.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="frp\net\Socket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="frp\server\Switches.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="frp\net\IPEndPoint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="frp\net\Ipep.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="frp\messages\HandshakeRequest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="frp\server\MappingEntry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="frp\messages\Packet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="frp\server\Connection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="frp\messages\NetworkAddress.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="frp\configuration\Ini.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="frp\configuration\AppConfiguration.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="frp\client\Router.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="frp\transmission\WebSocketTransmission.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="frp\transmission\ITransmission.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="frp\transmission\SslSocketTransmission.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="frp\ssl\SSL.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="frp\cryptography\Encryptor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="frp\transmission\EncryptorTransmission.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="frp\transmission\SslWebSocketTransmission.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="frp\configuration\SslConfiguration.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="frp\configuration\AppConfiguration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\configuration\MappingConfiguration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\io\BinaryReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\io\File.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\io\MemoryStream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\io\SeekOrigin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\io\Stream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\text\Encoding.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\threading\Hosting.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\transmission\ITransmission.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\IDisposable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\transmission\Transmission.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\net\Socket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\server\Switches.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\net\IPEndPoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\net\Ipep.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\server\MappingEntry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\messages\HandshakeRequest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\configuration\MappingType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\messages\PacketCommands.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\messages\Packet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\server\Connection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\messages\NetworkAddress.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\configuration\Ini.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\collections\Dictionary.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\client\Router.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\Reference.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\transmission\WebSocketTransmission.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\threading\Timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\ssl\root_certificates.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\transmission\SslSocketTransmission.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\ssl\SSL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\cryptography\Encryptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\transmission\EncryptorTransmission.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\transmission\SslWebSocketTransmission.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\transmission\templates\WebSocket.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\transmission\templates\SslSocket.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\configuration\SslConfiguration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\configuration\WebSocketConfiguration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\collections\ConnectionManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\collections\DatagramPortManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\collections\TransmissionManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\collections\RestartTasksManger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frp\messages\checksum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="frpc.ini" />
+    <None Include="Resource.aps" />
+    <None Include="frps.ini" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="CMakeLists.txt" />
+  </ItemGroup>
+</Project>
