@@ -28,6 +28,14 @@ namespace frp {
             return remoteEP_;
         }
 
+        void Transmission::SetLocalEndPoint(const frp::net::IPEndPoint& value) noexcept {
+            localEP_ = value;
+        }
+
+        void Transmission::SetRemoteEndPoint(const frp::net::IPEndPoint& value) noexcept {
+            remoteEP_ = value;
+        }
+
         std::shared_ptr<boost::asio::io_context> Transmission::GetContext() noexcept {
             return context_;
         }

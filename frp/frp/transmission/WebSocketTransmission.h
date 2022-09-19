@@ -21,7 +21,7 @@ namespace frp {
             virtual bool                                                HandshakeAsync(HandshakeType type, const BOOST_ASIO_MOVE_ARG(HandshakeAsyncCallback) callback) noexcept override;
             virtual bool                                                WriteAsync(const std::shared_ptr<Byte>& buffer, int offset, int length, const BOOST_ASIO_MOVE_ARG(WriteAsyncCallback) callback) noexcept override;
             virtual bool                                                ReadAsync(const BOOST_ASIO_MOVE_ARG(ReadAsyncCallback) callback) noexcept override;
-            
+
         public:
             static std::string                                          WSSOF(
                 const std::string&                                      url,
@@ -30,7 +30,6 @@ namespace frp {
                 std::string&                                            path,
                 int&                                                    port,
                 bool&                                                   tlsv) noexcept;
-            static bool                                                 CheckPath(std::string& root, const boost::beast::string_view& sw) noexcept;
 
         protected:
             virtual bool                                                OnWriteAsync(const BOOST_ASIO_MOVE_ARG(pmessage) message) noexcept override;

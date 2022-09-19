@@ -122,6 +122,17 @@ namespace frp {
                     }
                 }
 
+            protected:
+                virtual void SetAddress(const std::string& address) noexcept override {
+                    if (address.size()) {
+                        std::shared_ptr<SslWebSocketTransmission> transmission = transmission_;
+                        if (transmission) {
+                            IPEndPoint remoteEP = transmission->GetRemoteEndPoint();
+                            transmission->SetRemoteEndPoint(IPEndPoint(address.data(), remoteEP.Port));
+                        }
+                    }
+                }
+
             private:
                 std::shared_ptr<SslWebSocketTransmission> transmission_;
             };

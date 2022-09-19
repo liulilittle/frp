@@ -1,6 +1,7 @@
 #pragma once
 
-#include <frp/transmission/WebSocketTransmission.h>
+#include <frp/IDisposable.h>
+#include <frp/net/IPEndPoint.h>
 
 namespace frp {
     namespace transmission {
@@ -11,7 +12,9 @@ namespace frp {
                 typedef frp::transmission::ITransmission            ITransmission;
                 typedef ITransmission::HandshakeAsyncCallback       HandshakeAsyncCallback;
                 typedef ITransmission::HandshakeType                HandshakeType;
-                typedef frp::transmission::WebSocketTransmission    WebSocketTransmission;
+                typedef frp::net::IPEndPoint                        IPEndPoint;
+                typedef boost::beast::http::dynamic_body            dynamic_body;
+                typedef boost::beast::http::request<dynamic_body>   http_request;
 
             public:
                 inline WebSocket(
@@ -23,6 +26,9 @@ namespace frp {
                     , websocket_(websocket) {
                     websocket_.binary(true);
                 }
+
+            protected:
+                virtual void                                        SetAddress(const std::string& address) = 0;
 
             public:
                 inline void                                         Close() noexcept {
@@ -48,8 +54,6 @@ namespace frp {
                             });
                     }
                     else {
-                        typedef boost::beast::http::request<boost::beast::http::dynamic_body> http_request;
-
                         // This buffer is used for reading and must be persisted
                         std::shared_ptr<boost::beast::flat_buffer> buffer = make_shared_object<boost::beast::flat_buffer>();
 
@@ -80,7 +84,7 @@ namespace frp {
                                             res.set(boost::beast::http::field::server, std::string(BOOST_BEAST_VERSION_STRING));
                                         }));
 
-                                    success = WebSocketTransmission::CheckPath(path_, req->target());
+                                    success = CheckPath(path_, req->target());
                                     if (!success) {
                                         ec = boost::beast::websocket::error::closed;
                                     }
@@ -93,6 +97,7 @@ namespace frp {
                                                 }
                                                 callback_(success);
                                             });
+                                        SetAddress(GetAddress(*req));
                                     }
                                 } while (0);
 
@@ -103,6 +108,81 @@ namespace frp {
                             });
                     }
                     return true;
+                }
+                
+            private:
+                static std::string                                  GetAddress(http_request& req) noexcept {
+                    static const int _RealIpHeadersSize = 5;
+                    static const char* _RealIpHeaders[_RealIpHeadersSize] = {
+                        "CF-Connecting-IP",
+                        "True-Client-IP",
+                        "X-Real-IP",
+                        "REMOTE-HOST",
+                        "X-Forwarded-For",
+                    };
+                    // proxy_set_header Host $host;
+                    // proxy_set_header X-Real-IP $remote_addr;
+                    // proxy_set_header REMOTE-HOST $remote_addr;
+                    // proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                    for (int i = 0; i < _RealIpHeadersSize; i++) {
+                        http_request::iterator tail = req.find(_RealIpHeaders[i]);
+                        http_request::iterator endl = req.end();
+                        if (tail == endl) {
+                            continue;
+                        }
+
+                        const boost::beast::string_view& sw = tail->value();
+                        if (sw.empty()) {
+                            continue;
+                        }
+
+                        const std::string address = std::string(sw.data(), sw.size());
+                        IPEndPoint localEP(address.c_str(), IPEndPoint::MinPort);
+                        if (IPEndPoint::IsInvalid(localEP)) {
+                            continue;
+                        }
+
+                        return localEP.ToAddressString();
+                    }
+                    return std::string();
+                }
+                static bool                                         CheckPath(std::string& root, const boost::beast::string_view& sw) noexcept {
+                    if (root.size() <= 1) {
+                        return true;
+                    }
+
+                    std::string path_ = "/";
+                    if (sw.size()) {
+                        path_ = ToLower(LTrim(RTrim(std::string(sw.data(), sw.size()))));
+                        if (path_.empty()) {
+                            return false;
+                        }
+                    }
+
+                    std::size_t sz_ = path_.find_first_of('?');
+                    if (sz_ == std::string::npos) {
+                        sz_ = path_.find_first_of('#');
+                    }
+
+                    if (sz_ != std::string::npos) {
+                        path_ = path_.substr(0, sz_);
+                    }
+
+                    if (path_.size() < root.size()) {
+                        return false;
+                    }
+
+                    std::string lroot_ = ToLower(root);
+                    if (path_ == lroot_) {
+                        return true;
+                    }
+
+                    if (path_.size() == lroot_.size()) {
+                        return false;
+                    }
+
+                    int ch = path_[lroot_.size()];
+                    return ch == '/';
                 }
 
             private:

@@ -42,6 +42,17 @@ namespace frp {
                     }
                 }
 
+            protected:
+                virtual void SetAddress(const std::string& address) noexcept override {
+                    if (address.size()) {
+                        std::shared_ptr<WebSocketTransmission> transmission = transmission_;
+                        if (transmission) {
+                            IPEndPoint remoteEP = transmission->GetRemoteEndPoint();
+                            transmission->SetRemoteEndPoint(IPEndPoint(address.data(), remoteEP.Port));
+                        }
+                    }
+                }
+
             private:
                 std::shared_ptr<WebSocketTransmission> transmission_;
             };
@@ -50,45 +61,6 @@ namespace frp {
             std::shared_ptr<AcceptWebSocket> accept =
                 NewReference<AcceptWebSocket>(transmission, websocket_, host_, path_);
             return accept->HandshakeAsync(type, forward0f(callback));
-        }
-
-        bool WebSocketTransmission::CheckPath(std::string& root, const boost::beast::string_view& sw) noexcept {
-            if (root.size() <= 1) {
-                return true;
-            }
-
-            std::string path_ = "/";
-            if (sw.size()) {
-                path_ = ToLower(LTrim(RTrim(std::string(sw.data(), sw.size()))));
-                if (path_.empty()) {
-                    return false;
-                }
-            }
-
-            std::size_t sz_ = path_.find_first_of('?');
-            if (sz_ == std::string::npos) {
-                sz_ = path_.find_first_of('#');
-            }
-
-            if (sz_ != std::string::npos) {
-                path_ = path_.substr(0, sz_);
-            }
-
-            if (path_.size() < root.size()) {
-                return false;
-            }
-
-            std::string lroot_ = ToLower(root);
-            if (path_ == lroot_) {
-                return true;
-            }
-
-            if (path_.size() == lroot_.size()) {
-                return false;
-            }
-
-            int ch = path_[lroot_.size()];
-            return ch == '/';
         }
 
         std::string WebSocketTransmission::WSSOF(

@@ -44,6 +44,10 @@ namespace frp {
             }
 
         protected:
+            void                                                    SetLocalEndPoint(const frp::net::IPEndPoint& value) noexcept;
+            void                                                    SetRemoteEndPoint(const frp::net::IPEndPoint& value) noexcept;
+
+        protected:
             void                                                    OnAddWriteAsync(const BOOST_ASIO_MOVE_ARG(pmessage) message) noexcept;
             bool                                                    OnAsyncWrite(bool internall) noexcept;
             virtual bool                                            OnWriteAsync(const BOOST_ASIO_MOVE_ARG(pmessage) message) noexcept;
