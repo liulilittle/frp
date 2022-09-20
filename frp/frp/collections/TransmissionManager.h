@@ -106,6 +106,14 @@ namespace frp {
                 transmissions_.push_back(transmission);
                 return true;
             }
+            template<typename WhileHandler>
+            inline void                                                 WhileAllTransmission(WhileHandler&& handler) noexcept {
+                TransmissionList::iterator tail = transmissions_.begin();
+                TransmissionList::iterator endl = transmissions_.end();
+                for (; tail != endl; tail++) {
+                    handler(*tail);
+                }
+            }
 
         private:
             TransmissionList                                            transmissions_;

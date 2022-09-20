@@ -80,7 +80,6 @@ namespace frp {
             , mapping_(mapping) {
             hosting_ = router->GetHosting();
             configuration_ = router->GetConfiguration();
-
         }
 
         bool Router::MappingEntry::Open() noexcept {
@@ -110,7 +109,30 @@ namespace frp {
                     return false;
                 }
             }
-            return true;
+
+            return Timeout();
+        }
+
+        bool Router::MappingEntry::Timeout() noexcept {
+            if (disposed_) {
+                return false;
+            }
+
+            std::shared_ptr<frp::threading::Hosting> hosting = router_->GetHosting();
+            if (!hosting) {
+                return false;
+            }
+
+            std::shared_ptr<Reference> reference = GetReference();
+            timeout_ = frp::threading::SetTimeout(hosting,
+                [reference, this](void*) noexcept {
+                    TransmissionManager::WhileAllTransmission(
+                        [this](TransmissionPtr& transmission) noexcept {
+                            SendKeepAlivePacket(transmission);
+                        });
+                    Timeout();
+                }, 30000);
+            return NULL != timeout_;
         }
 
         void Router::MappingEntry::Close() noexcept {
@@ -118,6 +140,7 @@ namespace frp {
         }
 
         void Router::MappingEntry::Dispose() noexcept {
+            frp::threading::ClearTimeout(timeout_);
             if (!disposed_.exchange(true)) {
                 ConnectionManager::ReleaseAllConnection();
                 DatagramPortManager::ReleaseAllDatagramPort();
@@ -307,6 +330,8 @@ namespace frp {
             case frp::messages::PacketCommands_WriteTo:
                 OnHandleWriteTo(transmission, *packet);
                 break;
+            case frp::messages::PacketCommands_Heartbeat:
+                break;
             default:
                 return false;
             }
@@ -364,6 +389,28 @@ namespace frp {
             }
 
             return datagramPort->SendToLocalClientAsync(packet.Buffer.get(), packet.Offset, packet.Length);
+        }
+
+        bool Router::MappingEntry::SendKeepAlivePacket(const TransmissionPtr& transmission) noexcept {
+            frp::messages::Packet packet;
+            packet.Command = frp::messages::PacketCommands::PacketCommands_Heartbeat;
+            packet.Id = 0;
+            packet.Offset = 0;
+            packet.Length = 0;
+
+            int messages_size;
+            std::shared_ptr<Byte> message_ = packet.Serialize(messages_size);
+            if (!message_ || messages_size < 1) {
+                return false;
+            }
+
+            const TransmissionPtr transmission_ = transmission;
+            const std::shared_ptr<Reference> reference_ = GetReference();
+
+            return Then(transmission_, transmission_->WriteAsync(message_, 0, messages_size,
+                [transmission_, reference_, this](bool success) noexcept {
+                    Then(transmission_, success);
+                }));
         }
 
         Router::TransmissionPtr Router::CreateTransmission(const std::shared_ptr<boost::asio::io_context>& context, const std::shared_ptr<boost::asio::ip::tcp::socket>& socket) noexcept {

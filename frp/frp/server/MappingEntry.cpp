@@ -165,10 +165,35 @@ namespace frp {
             case frp::messages::PacketCommands_WriteTo:
                 OnHandleWriteTo(transmission, *packet);
                 break;
+            case frp::messages::PacketCommands_Heartbeat:
+                OnHandleHeartbeat(transmission);
+                break;
             default:
                 return false;
             }
             return true;
+        }
+
+        bool MappingEntry::OnHandleHeartbeat(const TransmissionPtr& transmission) noexcept { /* Keep-Alives. */
+            frp::messages::Packet packet;
+            packet.Command = frp::messages::PacketCommands::PacketCommands_Heartbeat;
+            packet.Id = 0;
+            packet.Offset = 0;
+            packet.Length = 0;
+
+            int messages_size;
+            std::shared_ptr<Byte> message_ = packet.Serialize(messages_size);
+            if (!message_ || messages_size < 1) {
+                return false;
+            }
+
+            const TransmissionPtr transmission_ = transmission;
+            const std::shared_ptr<Reference> reference_ = GetReference();
+
+            return Then(transmission_, transmission_->WriteAsync(message_, 0, messages_size,
+                [transmission_, reference_, this](bool success) noexcept {
+                    Then(transmission_, success);
+                }));
         }
 
         bool MappingEntry::OnHandleConnectOK(const TransmissionPtr& transmission, int id) noexcept {

@@ -8,6 +8,7 @@ namespace frp {
             PacketCommands_Disconnect,
             PacketCommands_Write,
             PacketCommands_WriteTo,
+            PacketCommands_Heartbeat,
         };
     }
 }

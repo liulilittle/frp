@@ -174,6 +174,10 @@ namespace frp {
                 bool                                                        OnPacketInput(const TransmissionPtr& transmission, const std::shared_ptr<frp::messages::Packet>& packet) noexcept;
 
             private:
+                bool                                                        Timeout() noexcept;
+                bool                                                        SendKeepAlivePacket(const TransmissionPtr& transmission) noexcept;
+
+            private:
                 bool                                                        OnHandleConnect(const TransmissionPtr& transmission, frp::messages::Packet& packet) noexcept;
                 bool                                                        OnHandleDisconnect(const TransmissionPtr& transmission, int id) noexcept;
                 bool                                                        OnHandleWrite(const TransmissionPtr& transmission, frp::messages::Packet& packet) noexcept;
@@ -189,6 +193,7 @@ namespace frp {
                 MappingConfiguration                                        mapping_;
                 std::shared_ptr<AppConfiguration>                           configuration_;
                 std::shared_ptr<frp::threading::Hosting>                    hosting_;
+                std::shared_ptr<boost::asio::deadline_timer>                timeout_;
             };
             typedef std::shared_ptr<MappingEntry>                           MappingEntryPtr;
             typedef std::unordered_map<void*, MappingEntryPtr>              MappingEntryTable;

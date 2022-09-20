@@ -53,6 +53,7 @@ namespace frp {
             bool                                                        OnPacketInput(const TransmissionPtr& transmission, const std::shared_ptr<frp::messages::Packet>& packet) noexcept;
 
         private:
+            bool                                                        OnHandleHeartbeat(const TransmissionPtr& transmission) noexcept;
             bool                                                        OnHandleConnectOK(const TransmissionPtr& transmission, int id) noexcept;
             bool                                                        OnHandleDisconnect(const TransmissionPtr& transmission, int id) noexcept;
             bool                                                        OnHandleWrite(const TransmissionPtr& transmission, frp::messages::Packet& packet) noexcept;
