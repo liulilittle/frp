@@ -94,21 +94,14 @@ namespace frp {
                 }
                 return false;
             }
-            inline void*                                        GetBestKey() noexcept {
+            template<typename WhileHandler>
+            inline void                                         WhileAllConnectionCount(WhileHandler&& handler) noexcept {
                 typename ConnectionKeyTable::iterator tail = connectionss_.begin();
                 typename ConnectionKeyTable::iterator endl = connectionss_.end();
 
-                void* key = NULL;
-                std::size_t key_size = 0;
-
                 for (; tail != endl; tail++) {
-                    std::size_t nxt_size = tail->second.size();
-                    if (!key || key_size > nxt_size) {
-                        key = tail->first;
-                        key_size = nxt_size;
-                    }
+                    handler(tail->first, tail->second.size());
                 }
-                return key;
             }
 
         private:

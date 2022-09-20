@@ -247,6 +247,48 @@ namespace frp {
             inline static bool TryAdd(TDictionary& dictionary, TKey&& key, TValue&& value) noexcept {
                 return dictionary.insert(std::make_pair(key, value)).second;
             }
+
+            template<typename TKey, typename TDictionary>
+            inline static TKey Min(TDictionary& dictionary, const TKey& defaultKey) noexcept {
+                typename TDictionary::iterator tail = dictionary.begin();
+                typename TDictionary::iterator endl = dictionary.end();
+                if (tail == endl) {
+                    return defaultKey;
+                }
+
+                TKey key = defaultKey;
+                std::size_t key_size = 0;
+
+                for (; tail != endl; tail++) {
+                    std::size_t nxt_size = tail->second;
+                    if (!key || key_size > nxt_size) {
+                        key = tail->first;
+                        key_size = nxt_size;
+                    }
+                }
+                return key;
+            }
+
+            template<typename TKey, typename TDictionary>
+            inline static TKey Max(TDictionary& dictionary, const TKey& defaultKey) noexcept {
+                typename TDictionary::iterator tail = dictionary.begin();
+                typename TDictionary::iterator endl = dictionary.end();
+                if (tail == endl) {
+                    return defaultKey;
+                }
+
+                TKey key = defaultKey;
+                std::size_t key_size = 0;
+
+                for (; tail != endl; tail++) {
+                    std::size_t nxt_size = tail->second;
+                    if (!key || key_size < nxt_size) {
+                        key = tail->first;
+                        key_size = nxt_size;
+                    }
+                }
+                return key;
+            }
         };
     }
 }

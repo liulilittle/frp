@@ -43,12 +43,23 @@ namespace frp {
                     return NULL;
                 }
 
+                typedef std::map<void*, std::size_t> ConnectionSizeTable;
                 if (GetTransmissionCount() == 1) {
                     return *tail;
                 }
                 
+                ConnectionSizeTable connection_sizes;
+                for (typename TransmissionList::iterator i = tail; i != endl; i++) {
+                    connection_sizes[i->get()] = 0;
+                }
+
+                TransmissionManager::WhileAllConnectionCount(
+                    [&connection_sizes](void* key, std::size_t count) noexcept {
+                        connection_sizes[key] = count;
+                    });
+
                 TransmissionPtr transmission;
-                void* key = TransmissionManager::GetBestKey();
+                void* key = Dictionary::Min<void*>(connection_sizes, NULL);
                 if (!key || !Dictionary::TryGetValue(transmissionTable_, key, transmission)) {
                     transmission = std::move(*tail);
                     transmissions_.erase(tail);
