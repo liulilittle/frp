@@ -27,40 +27,36 @@ namespace frp {
             
         }
 
-        void Router::Dispose() noexcept {
+        void Router::Close() noexcept {
             if (!disposed_.exchange(true)) {
-                CloseAllEntries();
+                Dictionary::ReleaseAllPairs(mappings_);
             }
         }
 
-        void Router::CloseAllEntries() noexcept {
-            Dictionary::ReleaseAllPairs(mappings_);
-        }
-
-        bool Router::CloseEntry(MappingEntry* entry) noexcept {
-            if (!entry) {
-                return false;
-            }
-
-            MappingEntryPtr mapping;
-            if (!Dictionary::TryRemove(mappings_, entry, mapping)) {
-                return false;
-            }
-
-            mapping->Close();
-            return true;
+        void Router::Dispose() noexcept {
+            Close();
         }
 
         bool Router::Open() noexcept {
             typedef frp::configuration::MappingConfigurationArrayList MappingConfigurationArrayList;
 
+            /* Failed when the object was marked as released or a local mapping was created dynamically. */
             if (disposed_ || mappings_.size()) {
                 return false;
             }
 
+            /* Gets a reference to the dynamic mapping configuration Arraylist. */
             MappingConfigurationArrayList& mappings = configuration_->Mappings;
+
+            /* Zero local dynamic mappings are not allowed to be created. */
+            std::size_t mapping_length = mappings.size();
+            if (!mapping_length) {
+                return false;
+            }
+
+            /* Attempts to create a local dynamic mapping and returns immediately if it fails. */
             std::shared_ptr<Router> router = CastReference<Router>(GetReference());
-            for (std::size_t index = 0, length = mappings.size(); index < length; index++) {
+            for (std::size_t index = 0; index < mapping_length; index++) {
                 const std::shared_ptr<MappingEntry> mapping = make_shared_object<MappingEntry>(router, mappings[index]);
                 if (!mapping) {
                     return false;
@@ -71,7 +67,7 @@ namespace frp {
                     return false;
                 }
             }
-            return mappings_.size() > 0;
+            return mappings_.size() == mapping_length;
         }
 
         Router::MappingEntry::MappingEntry(const std::shared_ptr<Router>& router, const MappingConfiguration& mapping) noexcept
@@ -136,17 +132,17 @@ namespace frp {
         }
 
         void Router::MappingEntry::Close() noexcept {
-            Dispose();
-        }
-
-        void Router::MappingEntry::Dispose() noexcept {
-            frp::threading::ClearTimeout(timeout_);
             if (!disposed_.exchange(true)) {
                 ConnectionManager::ReleaseAllConnection();
                 DatagramPortManager::ReleaseAllDatagramPort();
                 TransmissionManager::ReleaseAllTransmission();
                 RestartTasksManger::CloseAllRestartTasks();
             }
+            frp::threading::ClearTimeout(timeout_);
+        }
+
+        void Router::MappingEntry::Dispose() noexcept {
+            Close();
         }
 
         bool Router::MappingEntry::Then(const TransmissionPtr& transmission, bool success) noexcept {
@@ -286,31 +282,32 @@ namespace frp {
                 return false;
             }
 
-            const std::shared_ptr<Reference> reference_ = GetReference();
-            const TransmissionPtr transmission_ = transmission;
+            const std::shared_ptr<Reference> sreference = GetReference();
+            const TransmissionPtr stransmission = transmission;
 
-            if (!transmission_->WriteAsync(packet, 0, length,
-                [reference_, this, transmission_](bool success) noexcept {
-                    Then(transmission_, success);
+            if (!stransmission->WriteAsync(packet, 0, length,
+                [sreference, this, stransmission](bool success) noexcept {
+                    Then(stransmission, success);
                 })) {
                 return false;
             }
 
-            return AddTransmission(transmission_);
+            return AddTransmission(stransmission);
         }
 
         bool Router::MappingEntry::PacketInputAsync(const TransmissionPtr& transmission) noexcept {
-            const std::shared_ptr<Reference> reference_ = GetReference();
-            const TransmissionPtr transmission_ = transmission;
-
-            return transmission_->ReadAsync(
-                [reference_, this, transmission_](const std::shared_ptr<Byte>& buffer, int length) noexcept {
+            const TransmissionPtr stransmission = transmission;
+            const std::shared_ptr<Reference> sreference = GetReference();
+            return stransmission->ReadAsync(
+                [sreference, this, stransmission](const std::shared_ptr<Byte>& buffer, int length) noexcept {
                     bool success = false;
-                    std::shared_ptr<frp::messages::Packet> packet = frp::messages::Packet::Deserialize(buffer, 0, length);
-                    if (packet) {
-                        success = OnPacketInput(transmission_, packet) && PacketInputAsync(transmission_);
+                    if (length > 0) {
+                        std::shared_ptr<frp::messages::Packet> packet = frp::messages::Packet::Deserialize(buffer, 0, length);
+                        if (packet) {
+                            success = OnPacketInput(stransmission, packet) && PacketInputAsync(stransmission);
+                        }
                     }
-                    Then(transmission_, success);
+                    Then(stransmission, success);
                 });
         }
 
@@ -498,6 +495,7 @@ namespace frp {
                 [reference, this](void*) noexcept {
                     Close();
                 }, (UInt64)configuration_->Connect.Timeout * 1000);
+
             socket_.async_connect(IPEndPoint::ToEndPoint<boost::asio::ip::tcp>(remoteEP),
                 [reference, this](const boost::system::error_code& ec) noexcept {
                     bool success = ec ? false : true;
@@ -618,7 +616,7 @@ namespace frp {
 
         void Router::Connection::Close() noexcept {
             /* Sync connection status. */
-            int status = status_.exchange(CONNECTION_STATUS_CLOSE);
+            const int status = status_.exchange(CONNECTION_STATUS_CLOSE);
             if (status == CONNECTION_STATUS_UNOPEN) { // 未打开连接状态
                 return;
             }
@@ -629,14 +627,11 @@ namespace frp {
             frp::net::Socket::Closesocket(socket_);
 
             /* Wait frp server closesocket async. */
-            if (status != CONNECTION_STATUS_CLOSE) { 
+            if (status != CONNECTION_STATUS_CLOSE) {
                 const std::shared_ptr<Reference> reference = GetReference();
-                SendCommandToFrpServerAsync(frp::messages::PacketCommands::PacketCommands_Disconnect, 
-                    [reference, this](bool success) noexcept {
+                SendCommandToFrpServerAsync(frp::messages::PacketCommands::PacketCommands_Disconnect,
+                    [reference, this](bool) noexcept {
                         entry_->ReleaseConnection(transmission_.get(), Id);
-                        if (!success) { 
-                            entry_->CloseTransmission(transmission_);
-                        }
                     });
             }
         }
@@ -698,18 +693,29 @@ namespace frp {
         }
 
         bool Router::Connection::SendToFrpServerAsync(const frp::messages::Packet& packet, const BOOST_ASIO_MOVE_ARG(WriteAsyncCallback) callback) noexcept {
-            int status = status_;
+            const int status = status_;
             if (status == CONNECTION_STATUS_UNOPEN) {
                 return false;
             }
 
             int messages_size;
-            std::shared_ptr<Byte> message_ = constantof(packet).Serialize(messages_size);
+            const std::shared_ptr<Byte> message_ = constantof(packet).Serialize(messages_size);
             if (!message_ || messages_size < 1) {
                 return false;
             }
 
-            return Then(transmission_->WriteAsync(message_, 0, messages_size, forward0f(callback)));
+            const std::shared_ptr<Reference> reference = GetReference();
+            const WriteAsyncCallback scallback = BOOST_ASIO_MOVE_CAST(WriteAsyncCallback)(constantof(callback));
+            return Then(transmission_->WriteAsync(message_, 0, messages_size,
+                [reference, this, scallback](bool success) noexcept {
+                    if (!success) {
+                        entry_->CloseTransmission(transmission_);
+                    }
+
+                    if (scallback) {
+                        scallback(success);
+                    }
+                }));
         }
     
         Router::DatagramPort::DatagramPort(const std::shared_ptr<MappingEntry>& entry, boost::asio::ip::udp::endpoint remoteEP) noexcept
@@ -775,15 +781,15 @@ namespace frp {
         }
 
         void Router::DatagramPort::Close() noexcept {
-            Dispose();
-        }
-
-        void Router::DatagramPort::Dispose() noexcept {
             if (!disposed_.exchange(true)) {
-                ClearTimeout();
                 frp::net::Socket::Closesocket(socket_);
                 entry_->ReleaseDatagramPort(remoteEP_);
             }
+            ClearTimeout();
+        }
+
+        void Router::DatagramPort::Dispose() noexcept {
+            Close();
         }
 
         void Router::DatagramPort::ClearTimeout() noexcept {
@@ -791,11 +797,14 @@ namespace frp {
         }
 
         bool Router::DatagramPort::Timeout() noexcept {
-            std::shared_ptr<Reference> reference = GetReference();
+            /* The current timeout timer is cleared first, and the object is not processed if it has been marked free. */
+            ClearTimeout();
             if (disposed_) {
                 return false;
             }
 
+            /* Set the next asynchronous timeout to wait for processing. */
+            std::shared_ptr<Reference> reference = GetReference();
             timeout_ = frp::threading::SetTimeout(hosting_,
                 [reference, this](void*) noexcept {
                     UInt64 now = hosting_->CurrentMillisec();
@@ -818,7 +827,7 @@ namespace frp {
                     
                     Timeout();
                 }, 1000);
-            return true;
+            return NULL != timeout_;
         }
 
         bool Router::DatagramPort::SendToLocalClientAsync(const void* buffer, int offset, int length) noexcept {
@@ -858,16 +867,33 @@ namespace frp {
             std::shared_ptr<Reference> reference = GetReference();
             socket_.async_receive_from(boost::asio::buffer(buffer_.get(), frp::threading::Hosting::BufferSize), endpoint_,
                 [reference, this](const boost::system::error_code& ec, std::size_t sz) noexcept {
-                    if (ec == boost::system::errc::operation_canceled) {
-                        Close();
-                        return;
-                    }
-
-                    int length = std::max<int>(ec ? -1 : sz, -1);
-                    if (length > 0 && SendToFrpServerAsync(buffer_.get(), length)) {
-                        if (!ForwardedToFrpServerAsync()) {
-                            Close();
+                    bool success = true;
+                    do {
+                        /* Cancellation of the current asynchronous operation means that the dynamic port mapping has been marked free. */
+                        if (ec == boost::system::errc::operation_canceled) {
+                            success = false;
+                            break;
                         }
+
+                        /* No data was received or other socket error occurred. */
+                        int length = std::max<int>(ec ? -1 : sz, -1);
+                        if (length < 1) {
+                            break;
+                        }
+
+                        /* An attempt to asynchronously send to the frp server failed. */
+                        success = SendToFrpServerAsync(buffer_.get(), length);
+                        if (!success) {
+                            break;
+                        }
+
+                        /* An attempt to continue pulling up asynchronously waiting for forwarding to the frp server failed. */
+                        success = ForwardedToFrpServerAsync();
+                    } while (0); 
+
+                    /* If the current traffic forwarding operation fails, you need to disable dynamic port mapping. */
+                    if (!success) {
+                        Close();
                     }
                 });
             return true;

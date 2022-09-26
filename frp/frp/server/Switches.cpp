@@ -39,7 +39,7 @@ namespace frp {
             }
         }
 
-        void Switches::Dispose() noexcept {
+        void Switches::Close() noexcept {
             if (!disposed_.exchange(true)) {
                 /* Close the TCP socket acceptor function to prevent the system from continuously processing connections. */
                 frp::net::Socket::Closesocket(acceptor_);
@@ -55,6 +55,10 @@ namespace frp {
                     Dictionary::ReleaseAllPairs(entiress_[i]);
                 }
             }
+        }
+
+        void Switches::Dispose() noexcept {
+            Close();
         }
 
         bool Switches::Open() noexcept {

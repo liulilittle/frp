@@ -71,7 +71,7 @@ int main(int argc, const char* argv[]) noexcept {
 
     if (!configuration) {
         std::string messages_ = "Copyright (C) 2017 ~ 2022 SupersocksR ORG. All rights reserved.\r\n";
-        messages_ += "FRP(X) %s Version\r\n\r\n";
+        messages_ += "FAST REVERSE PROXY(X) %s Version\r\n\r\n";
         messages_ += "Cwd:\r\n    " + frp::GetCurrentDirectoryPath() + "\r\n";
         messages_ += "Usage:\r\n";
         messages_ += "    .%s%s -c [config.ini] \r\n";

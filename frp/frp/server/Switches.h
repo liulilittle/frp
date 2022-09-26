@@ -48,6 +48,7 @@ namespace frp {
                 return acceptor_.local_endpoint(ec);
             }
             bool                                                            Open() noexcept;
+            void                                                            Close() noexcept;
             virtual void                                                    Dispose() noexcept override;
 
         protected:

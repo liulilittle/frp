@@ -31,7 +31,7 @@ namespace frp {
 
         void Connection::Close() noexcept {
             /* Sync connection status. */
-            int status = status_.exchange(CONNECTION_STATUS_CLOSE);
+            const int status = status_.exchange(CONNECTION_STATUS_CLOSE);
             if (status == CONNECTION_STATUS_UNOPEN) { // 未打开连接状态
                 return;
             }
@@ -42,14 +42,11 @@ namespace frp {
             frp::net::Socket::Closesocket(socket_);
 
             /* Wait frp client closesocket async. */
-            if (status != CONNECTION_STATUS_CLOSE) { 
+            if (status != CONNECTION_STATUS_CLOSE) {
                 const std::shared_ptr<Reference> reference = GetReference();
-                SendCommandToFrpClientAsync(frp::messages::PacketCommands::PacketCommands_Disconnect, 
-                    [reference, this](bool success) noexcept {
+                SendCommandToFrpClientAsync(frp::messages::PacketCommands::PacketCommands_Disconnect,
+                    [reference, this](bool) noexcept {
                         entry_->ReleaseConnection(transmission_.get(), Id);
-                        if (!success) { 
-                            entry_->CloseTransmission(transmission_);
-                        }
                     });
             }
         }
@@ -224,18 +221,29 @@ namespace frp {
         }
 
         bool Connection::SendToFrpClientAsync(const frp::messages::Packet& packet, const BOOST_ASIO_MOVE_ARG(WriteAsyncCallback) callback) noexcept {
-            int status = status_;
+            const int status = status_;
             if (status == CONNECTION_STATUS_UNOPEN) {
                 return false;
             }
 
             int messages_size;
-            std::shared_ptr<Byte> message_ = constantof(packet).Serialize(messages_size);
+            const std::shared_ptr<Byte> message_ = constantof(packet).Serialize(messages_size);
             if (!message_ || messages_size < 1) {
                 return false;
             }
 
-            return Then(transmission_->WriteAsync(message_, 0, messages_size, forward0f(callback)));
+            const std::shared_ptr<Reference> reference = GetReference();
+            const WriteAsyncCallback scallback = BOOST_ASIO_MOVE_CAST(WriteAsyncCallback)(constantof(callback));
+            return Then(transmission_->WriteAsync(message_, 0, messages_size,
+                [reference, this, scallback](bool success) noexcept {
+                    if (!success) {
+                        entry_->CloseTransmission(transmission_);
+                    }
+
+                    if (scallback) {
+                        scallback(success);
+                    }
+                }));
         }
     }
 }

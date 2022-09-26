@@ -25,10 +25,6 @@ namespace frp {
         }
 
         void MappingEntry::Close() noexcept {
-            Dispose();
-        }
-
-        void MappingEntry::Dispose() noexcept {
             if (!disposed_.exchange(true)) {
                 ConnectionManager::ReleaseAllConnection();
                 TransmissionManager::ReleaseAllTransmission();
@@ -38,6 +34,10 @@ namespace frp {
 
                 switches_->CloseEntry(Type, Port);
             }
+        }
+
+        void MappingEntry::Dispose() noexcept {
+            Close();
         }
 
         bool MappingEntry::Open() noexcept {
@@ -107,14 +107,32 @@ namespace frp {
             std::shared_ptr<Reference> reference = GetReference();
             socket_.async_receive_from(boost::asio::buffer(buffer_.get(), frp::threading::Hosting::BufferSize), endpoint_,
                 [reference, this](const boost::system::error_code& ec, std::size_t sz) noexcept {
-                    if (ec == boost::system::errc::operation_canceled) {
-                        Close();
-                        return;
-                    }
+                    bool success = true;
+                    do {
+                        /* Cancellation of the current asynchronous operation means that the dynamic port mapping has been marked free. */
+                        if (ec == boost::system::errc::operation_canceled) {
+                            success = false;
+                            break;
+                        }
 
-                    int length = std::max<int>(ec ? -1 : sz, -1);
-                    if (length > 0 && SendToFrpClientAsync(buffer_.get(), length, endpoint_)) {
+                        /* No data was received or other socket error occurred. */
+                        int length = std::max<int>(ec ? -1 : sz, -1);
+                        if (length < 1) {
+                            break;
+                        }
+
+                        /* An attempt to asynchronously send to the frp client failed. */
+                        if (!SendToFrpClientAsync(buffer_.get(), length, endpoint_)) {
+                            break;
+                        }
+
+                        /* An attempt to continue pulling up asynchronously waiting for forwarding to the frp client failed. */
                         ForwardedToFrpClientAsync();
+                    } while (0);
+
+                    /* If the current traffic forwarding operation fails, you need to disable dynamic port mapping. */
+                    if (!success) {
+                        Close();
                     }
                 });
             return true;
@@ -238,17 +256,18 @@ namespace frp {
         }
 
         bool MappingEntry::PacketInputAsync(const TransmissionPtr& transmission) noexcept {
-            const std::shared_ptr<Reference> reference_ = GetReference();
-            const TransmissionPtr transmission_ = transmission;
-
-            return transmission_->ReadAsync(
-                [reference_, this, transmission_](const std::shared_ptr<Byte>& buffer, int length) noexcept {
+            const TransmissionPtr stransmission = transmission;
+            const std::shared_ptr<Reference> sreference = GetReference();
+            return stransmission->ReadAsync(
+                [sreference, this, stransmission](const std::shared_ptr<Byte>& buffer, int length) noexcept {
                     bool success = false;
-                    std::shared_ptr<frp::messages::Packet> packet = frp::messages::Packet::Deserialize(buffer, 0, length);
-                    if (packet) {
-                        success = OnPacketInput(transmission_, packet) && PacketInputAsync(transmission_);
+                    if (length > 0) {
+                        std::shared_ptr<frp::messages::Packet> packet = frp::messages::Packet::Deserialize(buffer, 0, length);
+                        if (packet) {
+                            success = OnPacketInput(stransmission, packet) && PacketInputAsync(stransmission);
+                        }
                     }
-                    Then(transmission_, success);
+                    Then(stransmission, success);
                 });
         }
 

@@ -212,13 +212,10 @@ namespace frp {
         public:
             virtual void                                                    Dispose() noexcept override;
             virtual bool                                                    Open() noexcept;
+            void                                                            Close() noexcept;
 
         protected:
             virtual TransmissionPtr                                         CreateTransmission(const std::shared_ptr<boost::asio::io_context>& context, const std::shared_ptr<boost::asio::ip::tcp::socket>& socket) noexcept;
-
-        private:
-            bool                                                            CloseEntry(MappingEntry* entry) noexcept;
-            void                                                            CloseAllEntries() noexcept;
 
         private:
             std::atomic<bool>                                               disposed_;
