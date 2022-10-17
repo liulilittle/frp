@@ -404,7 +404,7 @@ namespace frp {
                 return true;
             }
 
-            if (config.Alignment < 512) {
+            if (config.Alignment < 512 || config.Alignment > frp::threading::Hosting::BufferSize) {
                 return false;
             }
 

@@ -28,11 +28,8 @@ namespace frp {
                 return NULL;
             }
 
-            _Ty2* native_pTy2 = const_cast<_Ty2*>(v.get());
-            _Ty1* native_pTy1 = static_cast<_Ty1*>(native_pTy2);
-
-            const std::shared_ptr<_Ty2> shared_pTy2 = v;
-            return std::shared_ptr<_Ty1>(native_pTy1, [shared_pTy2](const void*) noexcept {});
+            const std::shared_ptr<_Ty2> p(v);
+            return std::shared_ptr<_Ty1>(static_cast<_Ty1*>(v.get()), [p](const void*) noexcept {});
         }
 
     public:

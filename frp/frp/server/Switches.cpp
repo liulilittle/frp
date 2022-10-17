@@ -89,36 +89,38 @@ namespace frp {
 
         bool Switches::HandshakeAsync(const std::shared_ptr<frp::transmission::ITransmission>& transmission) noexcept {
             const std::shared_ptr<Reference> reference = GetReference();
-            if (!AddTimeout(transmission.get(), frp::threading::SetTimeout(hosting_,
-                [reference, this, transmission](void*) noexcept {
-                    transmission->Close();
-                    ClearTimeout(transmission.get());
+            const std::shared_ptr<frp::transmission::ITransmission> stransmission = transmission;
+
+            if (!AddTimeout(stransmission.get(), frp::threading::SetTimeout(hosting_,
+                [reference, this, stransmission](void*) noexcept {
+                    stransmission->Close();
+                    ClearTimeout(stransmission.get());
                 }, (UInt64)configuration_->Handshake.Timeout * 1000))) {
                 return false;
             }
 
-            return transmission->HandshakeAsync(frp::transmission::ITransmission::HandshakeType_Server, /* In order to extend the transport layer medium. */
-                [reference, this, transmission](bool handshaked) noexcept {
-                    handshaked = handshaked && transmission->ReadAsync(
-                        [reference, this, transmission](const std::shared_ptr<Byte>& buffer, int length) noexcept {
+            return stransmission->HandshakeAsync(frp::transmission::ITransmission::HandshakeType_Server, /* In order to extend the transport layer medium. */
+                [reference, this, stransmission](bool handshaked) noexcept {
+                    handshaked = handshaked && stransmission->ReadAsync(
+                        [reference, this, stransmission](const std::shared_ptr<Byte>& buffer, int length) noexcept {
                             bool success = false;
                             if (length > 0) {
                                 std::shared_ptr<frp::messages::HandshakeRequest> request = frp::messages::HandshakeRequest::Deserialize(buffer.get(), length);
                                 if (request) {
-                                    success = AddEntry(transmission, request);
+                                    success = AddEntry(stransmission, request);
                                 }
                             }
 
                             if (!success) {
-                                transmission->Close();
+                                stransmission->Close();
                             }
-                            ClearTimeout(transmission.get());
+                            ClearTimeout(stransmission.get());
                         });
 
                     /* Transmission handshake failed. */
                     if (!handshaked) {
-                        transmission->Close();
-                        ClearTimeout(transmission.get());
+                        stransmission->Close();
+                        ClearTimeout(stransmission.get());
                     }
                 });
         }

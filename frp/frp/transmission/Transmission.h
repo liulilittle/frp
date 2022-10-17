@@ -79,7 +79,7 @@ namespace frp {
 
                         Byte* p = buffer_.get();
                         length = p[0] << 8 | p[1];
-                        if (length < 1) {
+                        if (length < 1 || length > ETRANSMISSION_MSS) {
                             trigger(this, -1, callback_);
                             return;
                         }

@@ -401,12 +401,12 @@ namespace frp {
                 return false;
             }
 
-            const TransmissionPtr transmission_ = transmission;
-            const std::shared_ptr<Reference> reference_ = GetReference();
+            const TransmissionPtr stransmission = transmission;
+            const std::shared_ptr<Reference> sreference = GetReference();
 
-            return Then(transmission_, transmission_->WriteAsync(message_, 0, messages_size,
-                [transmission_, reference_, this](bool success) noexcept {
-                    Then(transmission_, success);
+            return Then(stransmission, stransmission->WriteAsync(message_, 0, messages_size,
+                [stransmission, sreference, this](bool success) noexcept {
+                    Then(stransmission, success);
                 }));
         }
 

@@ -139,7 +139,7 @@ namespace frp {
         }
 
         Transmission::pmessage Transmission::Pack(const void* buffer, int offset, int length, const BOOST_ASIO_MOVE_ARG(WriteAsyncCallback) callback) noexcept {
-            if (!buffer || offset < 0 || length < 1) {
+            if (!buffer || offset < 0 || length < 1 || length > ETRANSMISSION_MSS) {
                 return NULL;
             }
 
