@@ -30,13 +30,13 @@ namespace frp {
             const int                                                   Port;
 
         public:
-            MappingEntry(const std::shared_ptr<Switches>&               switches, 
+            MappingEntry(Switches&                                      switches,
                 const std::string&                                      name, 
                 frp::configuration::MappingType                         type, 
                 int                                                     port) noexcept;
 
         public:
-            inline const std::shared_ptr<Switches>&                     GetSwitches() noexcept {
+            inline Switches&                                            GetSwitches() noexcept {
                 return switches_;
             }
             void                                                        Close() noexcept;
@@ -68,7 +68,7 @@ namespace frp {
 
         private:
             std::atomic<bool>                                           disposed_;
-            std::shared_ptr<Switches>                                   switches_;
+            Switches&                                                   switches_;
             std::shared_ptr<frp::threading::Hosting>                    hosting_;
             std::shared_ptr<boost::asio::io_context>                    context_;
             std::shared_ptr<Byte>                                       buffer_;

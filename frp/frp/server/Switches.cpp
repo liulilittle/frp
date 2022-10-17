@@ -215,15 +215,10 @@ namespace frp {
                 return false;
             }
 
-            std::shared_ptr<Switches> switches = CastReference<Switches>(GetReference());
-            if (!switches) {
-                return false;
-            }
-
             std::shared_ptr<frp::server::MappingEntry> entry;
             MappingEntryTable& entires = entiress_[(int)request->Type];
             if (!Dictionary::TryGetValue(entires, request->RemotePort, entry)) {
-                entry = NewReference<frp::server::MappingEntry>(switches, request->Name, request->Type, request->RemotePort);
+                entry = NewReference<frp::server::MappingEntry>(*this, request->Name, request->Type, request->RemotePort);
                 if (!entry) {
                     return false;
                 }

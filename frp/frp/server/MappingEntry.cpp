@@ -10,14 +10,14 @@
 
 namespace frp {
     namespace server {
-        MappingEntry::MappingEntry(const std::shared_ptr<Switches>& switches, const std::string& name, frp::configuration::MappingType type, int port) noexcept
+        MappingEntry::MappingEntry(Switches& switches, const std::string& name, frp::configuration::MappingType type, int port) noexcept
             : Name(name)
             , Type(type)
             , Port(port)
             , disposed_(false)
             , switches_(switches)
-            , hosting_(switches->GetHosting())
-            , context_(switches->GetContext())
+            , hosting_(switches.GetHosting())
+            , context_(switches.GetContext())
             , buffer_(hosting_->GetBuffer())
             , socket_(*context_)
             , acceptor_(*context_) {
@@ -32,7 +32,7 @@ namespace frp {
                 frp::net::Socket::Closesocket(acceptor_);
                 frp::net::Socket::Closesocket(socket_);
 
-                switches_->CloseEntry(Type, Port);
+                switches_.CloseEntry(Type, Port);
             }
         }
 
@@ -42,7 +42,7 @@ namespace frp {
 
         bool MappingEntry::Open() noexcept {
             const std::shared_ptr<Reference> reference = GetReference();
-            const std::shared_ptr<frp::configuration::AppConfiguration>& configuration = switches_->GetConfiguration();
+            const std::shared_ptr<frp::configuration::AppConfiguration>& configuration = switches_.GetConfiguration();
 
             boost::system::error_code ec;
             boost::asio::ip::address address = boost::asio::ip::address::from_string(configuration->IP, ec);
@@ -51,7 +51,7 @@ namespace frp {
             }
 
             if (Type == frp::configuration::MappingType::MappingType_TCP) {
-                std::shared_ptr<frp::configuration::AppConfiguration> configuration = switches_->GetConfiguration();
+                std::shared_ptr<frp::configuration::AppConfiguration> configuration = switches_.GetConfiguration();
                 if (!frp::net::Socket::OpenAcceptor(acceptor_,
                     address,
                     Port,
@@ -72,7 +72,7 @@ namespace frp {
 
                 return frp::net::Socket::AcceptLoopbackAsync(hosting_, acceptor_,
                     [reference, this](const std::shared_ptr<boost::asio::io_context>& context, const frp::net::Socket::AsioTcpSocket& socket) noexcept {
-                        const std::shared_ptr<frp::configuration::AppConfiguration>& configuration = switches_->GetConfiguration();
+                        const std::shared_ptr<frp::configuration::AppConfiguration>& configuration = switches_.GetConfiguration();
                         frp::net::Socket::AdjustSocketOptional(*socket, configuration->FastOpen, configuration->Turbo.Wan);
                         return AcceptConnection(socket);
                     });
@@ -319,7 +319,7 @@ namespace frp {
         int MappingEntry::AddTransmission(const TransmissionPtr& transmission) noexcept {
             if (transmission) {
                 if (PacketInputAsync(transmission) && TransmissionManager::AddTransmission(transmission)) {
-                    const std::shared_ptr<frp::configuration::AppConfiguration>& configuration = switches_->GetConfiguration();
+                    const std::shared_ptr<frp::configuration::AppConfiguration>& configuration = switches_.GetConfiguration();
                     if (TransmissionManager::GetTransmissionCount() > 1) {
                         MAPPINGENTRY_LOGF("Accept mapping");
                     }
@@ -333,7 +333,7 @@ namespace frp {
 
         void MappingEntry::CloseTransmission(const TransmissionPtr& transmission) noexcept {
             if (TransmissionManager::CloseTransmission(transmission.get())) {
-                const std::shared_ptr<frp::configuration::AppConfiguration>& configuration = switches_->GetConfiguration();
+                const std::shared_ptr<frp::configuration::AppConfiguration>& configuration = switches_.GetConfiguration();
                 if (TransmissionManager::GetTransmissionCount()) {
                     MAPPINGENTRY_LOGF("Disconnect mapping");
                 }

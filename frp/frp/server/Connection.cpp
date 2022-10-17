@@ -20,8 +20,7 @@ namespace frp {
             , status_(CONNECTION_STATUS_UNOPEN)
             , socket_(socket)
             , writing_(false) {
-            const std::shared_ptr<Switches> switches = entry->GetSwitches();
-            configuration_ = switches->GetConfiguration();
+            configuration_ = entry->GetSwitches().GetConfiguration();
             const_cast<int&>(BufferSize) = configuration_->Alignment;
         }
 
