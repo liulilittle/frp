@@ -208,8 +208,8 @@ namespace frp {
                 }
 
                 int& alignment = configuration->Alignment;
-                if (alignment < 512) {
-                    alignment = 512;
+                if (alignment < (UINT8_MAX << 1)) {
+                    alignment = (UINT8_MAX << 1);
                 }
 
                 int& globalPort = configuration->Port;
@@ -376,6 +376,16 @@ namespace frp {
             elif(config.Port <= IPEndPoint::MinPort || config.Port > IPEndPoint::MaxPort) {
                 return true;
             }
+            elif(config.Mode == LoopbackMode::LoopbackMode_Client) {
+                if (IPEndPoint(config.IP.data(), config.Port).IsBroadcast()) {
+                    return false;
+                }
+            }
+            else {
+                if (IPEndPoint::IsInvalid(IPEndPoint(config.IP.data(), config.Port))) {
+                    return false;
+                }
+            }
 
             if (config.Protocol == ProtocolType::ProtocolType_WebSocket ||
                 config.Protocol == ProtocolType::ProtocolType_WebSocket_SSL) {
@@ -395,16 +405,11 @@ namespace frp {
                 }
             }
 
-            IPEndPoint remoteEP(config.IP.data(), config.Port);
-            if (IPEndPoint::IsInvalid(remoteEP)) {
-                return false;
-            }
-
             if (config.Backlog < 1) {
                 return true;
             }
 
-            if (config.Alignment < 512 || config.Alignment > frp::threading::Hosting::BufferSize) {
+            if (config.Alignment < (UINT8_MAX << 1) || config.Alignment > frp::threading::Hosting::BufferSize) {
                 return false;
             }
 

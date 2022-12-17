@@ -78,7 +78,9 @@ namespace frp {
             }
             inline bool                                                         IsNone() noexcept {
                 if (AddressFamily::InterNetwork != this->_AddressFamily) {
-                    return this->IsAny();
+                    int len;
+                    Byte* p = this->GetAddressBytes(len);
+                    return *p == 0xff;
                 }
                 else {
                     return this->GetAddress() == IPEndPoint::NoneAddress;
