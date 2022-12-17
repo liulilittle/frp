@@ -32,6 +32,10 @@
 #define elif else if
 #endif
 
+#ifndef arraysizeof
+#define arraysizeof(array_) (sizeof(array_) / sizeof(*array_))
+#endif
+
 #include <stdint.h>
 #include <signal.h>
 #include <limits.h>

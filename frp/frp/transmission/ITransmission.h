@@ -16,6 +16,9 @@ namespace frp {
             }                                                                   HandshakeType;
 
         public:
+            virtual                                                             ~ITransmission() noexcept override;
+
+        public:
             void                                                                Close() noexcept;
 
         public:
