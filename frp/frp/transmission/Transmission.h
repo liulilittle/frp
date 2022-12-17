@@ -59,7 +59,7 @@ namespace frp {
                     return false;
                 }
 
-                const std::shared_ptr<Reference> reference_ = GetReference();
+                const std::shared_ptr<ITransmission> reference_ = GetReference();
                 const ReadAsyncCallback callback_ = BOOST_ASIO_MOVE_CAST(ReadAsyncCallback)(constantof(callback));
                 const static auto trigger = [](Transmission* transmission, int length, const ReadAsyncCallback& callback) noexcept {
                     if (length < 1) {

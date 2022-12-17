@@ -411,34 +411,36 @@ namespace frp {
         }
 
         Router::TransmissionPtr Router::CreateTransmission(const std::shared_ptr<boost::asio::io_context>& context, const std::shared_ptr<boost::asio::ip::tcp::socket>& socket) noexcept {
+            std::shared_ptr<frp::transmission::ITransmission> transmission;
             if (configuration_->Protocol == AppConfiguration::ProtocolType_SSL ||
                 configuration_->Protocol == AppConfiguration::ProtocolType_TLS) {
-                return NewReference2<frp::transmission::ITransmission, frp::transmission::SslSocketTransmission>(hosting_, context, socket,
+                transmission = NewReference2<frp::transmission::ITransmission, frp::transmission::SslSocketTransmission>(hosting_, context, socket,
                     configuration_->Protocols.Ssl.VerifyPeer,
                     configuration_->Protocols.Ssl.Host,
                     configuration_->Protocols.Ssl.Ciphersuites);
             }
             elif(configuration_->Protocol == AppConfiguration::ProtocolType_Encryptor) {
-                return NewReference2<frp::transmission::ITransmission, frp::transmission::EncryptorTransmission>(hosting_, context, socket,
+                transmission = NewReference2<frp::transmission::ITransmission, frp::transmission::EncryptorTransmission>(hosting_, context, socket,
                     configuration_->Protocols.Encryptor.Method,
                     configuration_->Protocols.Encryptor.Password);
             }
             elif(configuration_->Protocol == AppConfiguration::ProtocolType_WebSocket) {
-                return NewReference2<frp::transmission::ITransmission, frp::transmission::WebSocketTransmission>(hosting_, context, socket,
+                transmission = NewReference2<frp::transmission::ITransmission, frp::transmission::WebSocketTransmission>(hosting_, context, socket,
                     configuration_->Protocols.WebSocket.Host,
                     configuration_->Protocols.WebSocket.Path);
             }
             elif(configuration_->Protocol == AppConfiguration::ProtocolType_WebSocket_SSL ||
                 configuration_->Protocol == AppConfiguration::ProtocolType_WebSocket_TLS) {
-                return NewReference2<frp::transmission::ITransmission, frp::transmission::SslWebSocketTransmission>(hosting_, context, socket,
+                transmission = NewReference2<frp::transmission::ITransmission, frp::transmission::SslWebSocketTransmission>(hosting_, context, socket,
                     configuration_->Protocols.Ssl.VerifyPeer,
                     configuration_->Protocols.WebSocket.Host,
                     configuration_->Protocols.WebSocket.Path,
                     configuration_->Protocols.Ssl.Ciphersuites);
             }
             else {
-                return NewReference2<frp::transmission::ITransmission, frp::transmission::Transmission>(hosting_, context, socket);
+                transmission = NewReference2<frp::transmission::ITransmission, frp::transmission::Transmission>(hosting_, context, socket);
             }
+            return transmission->Constructor(transmission);
         }
 
         Router::Connection::Connection(

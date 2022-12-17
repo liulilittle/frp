@@ -9,6 +9,7 @@ namespace frp {
             const std::string&                                          method,
             const std::string&                                          password) noexcept 
             : Transmission(hosting, context, socket) 
+            , disposed_(false)
             , encryptor_(method, password) {
             
         }
