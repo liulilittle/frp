@@ -31,7 +31,7 @@ namespace frp {
                 port,
                 configuration_->Backlog,
                 configuration_->FastOpen,
-                configuration_->Turbo.Lan)) {
+                configuration_->Turbo)) {
                 port = frp::net::Socket::LocalPort(acceptor_);
             }
             else {
@@ -82,7 +82,7 @@ namespace frp {
             const std::shared_ptr<Reference> reference = GetReference();
             return frp::net::Socket::AcceptLoopbackAsync(hosting_, acceptor_,
                 [reference, this](const std::shared_ptr<boost::asio::io_context>& context, const frp::net::Socket::AsioTcpSocket& socket) noexcept {
-                    frp::net::Socket::AdjustSocketOptional(*socket, configuration_->FastOpen, configuration_->Turbo.Wan);
+                    frp::net::Socket::AdjustSocketOptional(*socket, configuration_->FastOpen, configuration_->Turbo);
                     return HandshakeAsync(context, socket);
                 });
         }

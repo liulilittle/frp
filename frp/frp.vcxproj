@@ -207,6 +207,7 @@
     <ClInclude Include="frp\net\IPEndPoint.h" />
     <ClInclude Include="frp\net\Ipep.h" />
     <ClInclude Include="frp\net\Socket.h" />
+    <ClInclude Include="frp\Random.h" />
     <ClInclude Include="frp\Reference.h" />
     <ClInclude Include="frp\server\Connection.h" />
     <ClInclude Include="frp\server\MappingEntry.h" />

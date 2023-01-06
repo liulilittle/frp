@@ -1,4 +1,5 @@
 #include <frp/stdafx.h>
+#include <frp/Random.h>
 #include <frp/io/File.h>
 
 #ifdef _WIN32
@@ -13,6 +14,8 @@
 #endif
 
 namespace frp {
+    static Random GLOBAL_RANDOBJECT;
+
     void SetThreadPriorityToMaxLevel() noexcept {
 #ifdef _WIN32
         SetThreadPriority(GetCurrentProcess(), THREAD_PRIORITY_TIME_CRITICAL);
@@ -66,15 +69,6 @@ namespace frp {
             return false;
         }
         return true;
-    }
-
-    Char RandomAscii() noexcept {
-        static const int m_ = 3;
-        static Byte x_[m_] = { 'a', 'A', '0' };
-        static Byte y_[m_] = { 'z', 'Z', '9' };
-
-        int i_ = abs(RandomNext()) % m_;
-        return (Char)RandomNext(x_[i_], y_[i_]);
     }
 
     int GetHashCode(const char* s, int len) noexcept {
@@ -135,45 +129,25 @@ namespace frp {
         return (int)num;
     }
 
-    int RandomNext() noexcept {
-        return RandomNext(0, INT_MAX);
+    Char RandomAscii() noexcept {
+        static const int m_ = 3;
+        static Byte x_[m_] = { 'a', 'A', '0' };
+        static Byte y_[m_] = { 'z', 'Z', '9' };
+
+        int i_ = abs(GLOBAL_RANDOBJECT.Next()) % m_;
+        return (Char)GLOBAL_RANDOBJECT.Next(x_[i_], y_[i_]);
     }
 
-    int RandomNext_r(volatile unsigned int* seed) noexcept {
-        unsigned int next = *seed;
-        int result;
-
-        next *= 1103515245;
-        next += 12345;
-        result = (unsigned int)(next / 65536) % 2048;
-
-        next *= 1103515245;
-        next += 12345;
-        result <<= 10;
-        result ^= (unsigned int)(next / 65536) % 1024;
-
-        next *= 1103515245;
-        next += 12345;
-        result <<= 10;
-        result ^= (unsigned int)(next / 65536) % 1024;
-
-        *seed = next;
-        return result;
+    int RandomNext() noexcept {
+        return GLOBAL_RANDOBJECT.Next(0, INT_MAX);
     }
 
     int RandomNext(int minValue, int maxValue) noexcept {
-        static volatile unsigned int seed = time(NULL);
-
-        int v = RandomNext_r(&seed);
-        return v % (maxValue - minValue + 1) + minValue;
+        return GLOBAL_RANDOBJECT.Next(minValue, maxValue);
     }
 
     double RandomNextDouble() noexcept {
-        double d;
-        int* p = (int*)&d;
-        *p++ = RandomNext();
-        *p++ = RandomNext();
-        return d;
+        return GLOBAL_RANDOBJECT.NextDouble();
     }
 
     std::string StrFormatByteSize(Int64 size) noexcept {
@@ -260,45 +234,62 @@ namespace frp {
         std::string key2 = key1 + " ";
         key1.append("=");
         
+        std::string line;
         for (int i = 1; i < argc; i++) {
-            std::string line = argv[i];
-            if (line.empty()) {
-                continue;
-            }
-
-            std::string* key = addressof(key1);
-            std::size_t L = line.find(*key);
-            if (L == std::string::npos) {
-                key = addressof(key2);
-                L = line.find(*key);
-                if (L == std::string::npos) {
-                    continue;
-                }
-            }
-            elif(L) {
-                char ch = line[L - 1];
-                if (ch != ' ') {
-                    continue;
-                }
-            }
-
-            std::string cmd;
-            std::size_t M = L + key->size();
-            std::size_t R = line.find(' ', L);
-            if (R == std::string::npos) {
-                if (M != line.size()) {
-                    cmd = line.substr(M);
-                }
-            }
-            else {
-                int S = (int)(R - M);
-                if (S > 0) {
-                    cmd = line.substr(M, S);
-                }
-            }
-            return cmd;
+            line.append(RTrim(LTrim<std::string>(argv[i])));
+            line.append(" ");
         }
-        return "";
+        if (line.empty()) {
+            return "";
+        }
+
+        std::string* key = addressof(key1);
+        std::size_t L = line.find(*key);
+        if (L == std::string::npos) {
+            key = addressof(key2);
+            L = line.find(*key);
+            if (L == std::string::npos) {
+                return "";
+            }
+        }
+
+        if (L) {
+            char ch = line[L - 1];
+            if (ch != ' ') {
+                return "";
+            }
+        }
+
+        std::string cmd;
+        std::size_t M = L + key->size();
+        std::size_t R = line.find(' ', L);
+        if (M >= R) {
+            R = std::string::npos;
+            for (std::size_t I = M, SZ = line.size(); I < SZ; I++) {
+                int ch = line[I];
+                if (ch == ' ') {
+                    R = I;
+                    L = M;
+                    break;
+                }
+            }
+            if (!L || L == std::string::npos) {
+                return "";
+            }
+        }
+
+        if (R == std::string::npos) {
+            if (M != line.size()) {
+                cmd = line.substr(M);
+            }
+        }
+        else {
+            int S = (int)(R - M);
+            if (S > 0) {
+                cmd = line.substr(M, S);
+            }
+        }
+        return cmd;
     }
 
     std::string GetFullExecutionFilePath() noexcept {

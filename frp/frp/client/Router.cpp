@@ -218,7 +218,7 @@ namespace frp {
                 return false;
             }
             else {
-                frp::net::Socket::AdjustSocketOptional(*socket, configuration->FastOpen, configuration->Turbo.Wan);
+                frp::net::Socket::AdjustSocketOptional(*socket, configuration->FastOpen, configuration->Turbo);
             }
 
             std::shared_ptr<Reference> reference = GetReference();
@@ -489,7 +489,7 @@ namespace frp {
                 return false;
             }
             else {
-                frp::net::Socket::AdjustSocketOptional(socket_, configuration_->FastOpen, configuration_->Turbo.Wan);
+                frp::net::Socket::AdjustSocketOptional(socket_, configuration_->FastOpen, configuration_->Turbo);
             }
 
             const std::shared_ptr<Reference> reference = GetReference();

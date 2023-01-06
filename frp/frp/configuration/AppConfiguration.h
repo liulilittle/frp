@@ -20,10 +20,7 @@ namespace frp {
             int                                         Alignment = 0;
             int                                         Backlog = 511;
             bool                                        FastOpen = false;
-            struct {
-                bool                                    Lan = false;
-                bool                                    Wan = false;
-            }                                           Turbo;
+            bool                                        Turbo = false;
             struct {
                 int                                     Timeout = 10;
             }                                           Connect;

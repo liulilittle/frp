@@ -178,8 +178,7 @@ namespace frp {
                 configuration->IP = section["ip"];
                 configuration->Port = section.GetValue<int>("port");
                 configuration->FastOpen = section.GetValue<bool>("fast-open");
-                configuration->Turbo.Lan = section.GetValue<bool>("turbo.lan");
-                configuration->Turbo.Wan = section.GetValue<bool>("turbo.wan");
+                configuration->Turbo = section.GetValue<bool>("turbo");
                 configuration->Connect.Timeout = section.GetValue<int>("connect.timeout");
                 configuration->Inactive.Timeout = section.GetValue<int>("inactive.timeout");
                 configuration->Handshake.Timeout = section.GetValue<int>("handshake.timeout");

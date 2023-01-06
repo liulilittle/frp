@@ -57,7 +57,7 @@ namespace frp {
                     Port,
                     configuration->Backlog,
                     configuration->FastOpen,
-                    configuration->Turbo.Lan)) {
+                    configuration->Turbo)) {
                     return false;
                 }
 
@@ -73,7 +73,7 @@ namespace frp {
                 return frp::net::Socket::AcceptLoopbackAsync(hosting_, acceptor_,
                     [reference, this](const std::shared_ptr<boost::asio::io_context>& context, const frp::net::Socket::AsioTcpSocket& socket) noexcept {
                         const std::shared_ptr<frp::configuration::AppConfiguration>& configuration = switches_.GetConfiguration();
-                        frp::net::Socket::AdjustSocketOptional(*socket, configuration->FastOpen, configuration->Turbo.Wan);
+                        frp::net::Socket::AdjustSocketOptional(*socket, configuration->FastOpen, configuration->Turbo);
                         return AcceptConnection(socket);
                     });
             }
